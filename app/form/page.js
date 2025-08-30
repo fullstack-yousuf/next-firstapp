@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const page = () => {
+const Page = () => {
    const [formData, setFormData] = useState({
     appointmentType: 'walkin',
     firstName: '',
@@ -216,4 +216,4 @@ const page = () => {
   );
 }
 
-export default page
+export default Page

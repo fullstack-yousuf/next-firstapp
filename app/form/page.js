@@ -172,7 +172,7 @@ const Page = () => {
           </label>
 
           {formData.appointmentType === "walkin" ? (
-            <div className="w-full p-2 border border-gray-300 rounded-md text-gray-700 dark:bg-gray-100 ">
+            <div className="w-full p-2 border border-gray-300 rounded-md text-gray-500 dark:bg-gray-100 ">
               {liveTime || "Loading current time..."}
             </div>
           ) : (

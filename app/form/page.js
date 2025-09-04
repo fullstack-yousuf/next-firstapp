@@ -4,11 +4,7 @@ import { useState, useEffect } from "react";
 
 const Page = () => {
   const today = new Date();
-  const maxDobDate = new Date(
-    today.getFullYear() - 18,
-    today.getMonth(),
-    today.getDate() + 1
-  );
+  const maxDobDate = new Date(today.getFullYear() - 18, 11, 31);
   const maxDob = maxDobDate.toISOString().split("T")[0];
 
   const [formData, setFormData] = useState({
@@ -21,27 +17,33 @@ const Page = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [liveTime, setLiveTime] = useState("");
 
-  // Auto-set current datetime if walk-in (live update)
+  // Auto-update live time if walk-in
   useEffect(() => {
     if (formData.appointmentType === "walkin") {
-      const updateNow = () => {
+      const updateTime = () => {
         const now = new Date();
         const formattedNow = now.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
         setFormData((prev) => ({ ...prev, datetime: formattedNow }));
+        setLiveTime(
+          now.toLocaleString("en-US", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })
+        );
       };
 
-      updateNow(); // set immediately
-      const interval = setInterval(updateNow, 60000); // update every 1 min
+      updateTime(); // set immediately
+      const timer = setInterval(updateTime, 1000); // update every sec
 
-      return () => clearInterval(interval); // cleanup
+      return () => clearInterval(timer);
     }
   }, [formData.appointmentType]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -168,23 +170,25 @@ const Page = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Appointment Date & Time:
           </label>
-          <input
-            type="datetime-local"
-            name="datetime"
-            value={formData.datetime}
-            onChange={handleChange}
-            disabled={formData.appointmentType === "walkin"}
-            className={`w-full p-2 border rounded-md dark:bg-gray-100 dark:text-black ${
-              errors.datetime ? "border-red-500" : "border-gray-300"
-            } ${formData.appointmentType === "walkin" ? "bg-gray-100" : ""}`}
-          />
+
+          {formData.appointmentType === "walkin" ? (
+            <div className="w-full p-2 border border-gray-300 rounded-md text-gray-700 dark:bg-gray-100 ">
+              {liveTime || "Loading current time..."}
+            </div>
+          ) : (
+            <input
+              type="datetime-local"
+              name="datetime"
+              value={formData.datetime}
+              onChange={handleChange}
+              className={`w-full p-2 border rounded-md dark:bg-gray-100 dark:text-black ${
+                errors.datetime ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+          )}
+
           {errors.datetime && (
             <span className="text-red-500 text-sm">{errors.datetime}</span>
-          )}
-          {formData.appointmentType === "walkin" && (
-            <span className="text-gray-500 text-sm">
-              Current date/time is used for walk-in
-            </span>
           )}
         </div>
 
